@@ -4,15 +4,31 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
+/**
+ * TagSearchGUI 클래스는 태그 검색 및 추가 시스템의 GUI를 구현합니다.
+ * 태그 목록을 왼쪽에 표시하고, 선택된 태그와 관련된 학생 정보를 오른쪽에 출력합니다.
+ *
+ * 주요 기능:
+ * - 태그 목록 표시
+ * - 태그 기반 학생 검색
+ * - CSV 파일로 초기 데이터 로드
+ */
 public class TagSearchGUI extends JFrame {
     private TagSearch tagSearch; // 백엔드 로직
     private DefaultListModel<String> tagListModel; // 태그 목록 모델
     private JList<String> tagList; // 태그 목록 UI
     private JTextArea resultArea; // 결과 출력 영역
 
+    /**
+     * TagSearchGUI 생성자.
+     * GUI를 초기화하고 CSV 파일에서 데이터를 로드합니다.
+     */
     public TagSearchGUI() {
         // 백엔드 초기화
         tagSearch = new TagSearch();
@@ -45,7 +61,7 @@ public class TagSearchGUI extends JFrame {
         add(resultScrollPane, BorderLayout.CENTER);
 
         // 예시 데이터 추가
-        initializeExampleData();
+        loadInitialDataFromCSV("initial_data.csv");
 
         // JList 선택 이벤트 처리 (즉시 검색)
         tagList.addListSelectionListener(new ListSelectionListener() {
@@ -84,26 +100,66 @@ public class TagSearchGUI extends JFrame {
     }
 
     /**
-     * 예시 데이터를 초기화하는 메서드
+     * 태그 목록을 초기화하는 메서드.
+     * 현재 등록된 모든 태그를 가져와 JList에 추가합니다.
      */
-    private void initializeExampleData() {
-        // 예시 태그 추가 (실제 데이터는 CSV 로드 또는 동적 추가 가능)
-        tagListModel.addElement("축구");
-        tagListModel.addElement("농구");
-        tagListModel.addElement("수영");
-        tagListModel.addElement("야구");
-        tagListModel.addElement("오버워치");
-
-        // 예시 학생 및 태그 추가
-        tagSearch.addStudent("20230001");
-        tagSearch.addStudent("20230002");
-
-        tagSearch.addTagToStudent("20230001", "축구");
-        tagSearch.addTagToStudent("20230001", "농구");
-
-        tagSearch.addTagToStudent("20230002", "수영");
+    private void initializeTagList() {
+        // 기존 태그 데이터를 가져와 JList에 추가
+        tagListModel.clear();
+        Set<String> allTags = tagSearch.getAllTags();
+        for (String tag : allTags) {
+            tagListModel.addElement(tag);
+        }
     }
 
+    /**
+     * 태그 목록을 갱신하는 메서드.
+     * 새로운 태그가 추가되거나 삭제될 때 호출됩니다.
+     */
+    private void refreshTagList() {
+        tagListModel.clear();
+        Set<String> allTags = tagSearch.getAllTags();
+        for (String tag : allTags) {
+            tagListModel.addElement(tag);
+        }
+    }
+
+    /**
+     * CSV 파일에서 초기 데이터를 로드하는 메서드.
+     * 파일의 각 행은 학생 번호와 해당 학생의 태그로 구성됩니다.
+     *
+     * @param filename CSV 파일 경로
+     */
+    private void loadInitialDataFromCSV(String filename) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            boolean isHeader = true;
+            while ((line = br.readLine()) != null) {
+                if (isHeader) {
+                    isHeader = false;
+                    continue;
+                }
+                String[] values = line.split(",");
+                String studentNum = values[0];
+                tagSearch.addStudent(studentNum);
+                for (int i = 1; i < values.length; i++) {
+                    if (!values[i].isEmpty()) {
+                        tagSearch.addTagToStudent(studentNum, values[i]);
+                    }
+                }
+            }
+            initializeTagList(); // CSV 데이터 로드 후 태그 목록 초기화
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "CSV 파일 로드 실패: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 프로그램 실행 진입점.
+     * SwingUtilities.invokeLater를 사용하여 GUI를 생성하고 표시합니다.
+     *
+     * @param args 명령줄 인수 (사용되지 않음)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             TagSearchGUI gui = new TagSearchGUI();

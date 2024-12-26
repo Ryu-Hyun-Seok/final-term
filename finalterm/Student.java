@@ -10,7 +10,7 @@ public class Student {
 
 
     public Student(String studentNum) {
-        this.studentNumber = studentNumber;
+        this.studentNumber = studentNum;
         this.tags = new HashSet<>();
     }
 
