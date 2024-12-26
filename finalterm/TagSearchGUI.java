@@ -65,8 +65,17 @@ public class TagSearchGUI extends JFrame {
                     StringBuilder resultText = new StringBuilder("선택된 태그: " + selectedTags + "\n\n");
                     resultText.append("[태그가 겹치는 학생 정렬 결과]\n");
                     for (Map.Entry<String, Integer> entry : sortedResults) {
-                        resultText.append("학생번호: ").append(entry.getKey())
-                                .append(", 겹치는 태그 수: ").append(entry.getValue()).append("\n");
+                        String studentNum = entry.getKey();
+                        int matchingCount = entry.getValue();
+
+                        // 학생이 가진 태그와 선택된 태그의 교집합 계산
+                        Set<String> studentTags = tagSearch.getTagsByStudent(studentNum);
+                        Set<String> commonTags = new HashSet<>(studentTags);
+                        commonTags.retainAll(selectedTagSet); // 교집합 계산
+
+                        resultText.append("학생번호: ").append(studentNum)
+                                .append(", 겹치는 태그 수: ").append(matchingCount)
+                                .append(", 겹치는 태그: ").append(commonTags).append("\n");
                     }
                     resultArea.setText(resultText.toString());
                 }
