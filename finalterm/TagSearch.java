@@ -100,41 +100,5 @@ public class TagSearch {
         return studentMap.get(studentNum).getTags();
     }
 
-    public static void main(String[] args) {
-        TagSearch tagSearch = new TagSearch();
-
-        // 학생 추가
-        tagSearch.addStudent("20230001");
-        tagSearch.addStudent("20230002");
-        tagSearch.addStudent("20230003");
-
-        // 태그 추가
-        tagSearch.addTagToStudent("20230001", "축구");
-        tagSearch.addTagToStudent("20230001", "오버워치");
-        tagSearch.addTagToStudent("20230001", "농구");
-        tagSearch.addTagToStudent("20230001", "수영");
-
-        tagSearch.addTagToStudent("20230002", "수영");
-        tagSearch.addTagToStudent("20230002", "농구");
-
-        tagSearch.addTagToStudent("20230003", "축구");
-        tagSearch.addTagToStudent("20230003", "야구");
-
-        // 특정 태그에 연결된 학번 조회
-        System.out.println("축구 태그에 연결된 학번: " + tagSearch.searchByTag("축구"));
-
-        // 특정 학생이 등록한 모든 태그 조회
-        System.out.println("20230001의 등록된 태그: " + tagSearch.getTagsByStudent("20230001"));
-        System.out.println("20230002의 등록된 태그: " + tagSearch.getTagsByStudent("20230002"));
-
-        // 여러 태그로 검색하여 정렬된 결과 출력
-        Set<String> searchTags = new HashSet<>(Arrays.asList("축구", "수영", "농구"));
-        List<Map.Entry<String, Integer>> sortedResults = tagSearch.searchByMultipleTagsAndSort(searchTags);
-
-        System.out.println("\n[태그가 겹치는 학생 정렬 결과]");
-        for (Map.Entry<String, Integer> entry : sortedResults) {
-            System.out.println("학생번호: " + entry.getKey() + ", 겹치는 태그 수: " + entry.getValue());
-        }
-    }
 }
 
